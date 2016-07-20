@@ -52,11 +52,14 @@ setup(
     version=version,
     url='http://github.com/mmedal/shroud/',
     license='MIT',
-    description='Easy encryption for deployed secrets.',
+    description='Easy encryption/decryption for deployed secrets.',
     author='Matthew Medal',
     author_email='matt.medal@gmail.com',
     packages=get_packages('shroud'),
     package_data=get_package_data('shroud'),
+    scripts=[
+        'bin/shroud',
+    ],
     install_requires=[],
     classifiers=[
         'Intended Audience :: Developers',
