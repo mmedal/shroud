@@ -1,3 +1,6 @@
+# Main requirements
+pycrypto
+
 # Testing requirements
 coverage
 flake8
