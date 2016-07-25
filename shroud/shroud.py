@@ -61,21 +61,32 @@ def encrypt(secret, pubkey, secretsfile):
     click.echo("Encrypting secret")
     ciphertext = encryption.encrypt_secret_with_rsa_key(
         secret.encode(), pubkey.read())
-    click.echo("Writing encrypted secret to {}".format(secretsfile))
+    click.echo("Writing encrypted secret to {}".format(secretsfile.name))
     secretsfile.write(ciphertext)
 
 
 @click.command()
 @click.option('--secretsfile', '-s',
-              type=click.File('r'),
-              default='secrets.txt')
+              type=click.File('rb'),
+              default='secrets.txt',
+              help="The file to read the encrypted secrets from.")
 @click.option('--privkey', '-k',
               type=click.File('rb'),
               default=expanduser('~') + '/.ssh/shroud',
               help="The private key file to decrypt with.")
-def decrypt_secrets(secretsfile, privkey):
-    pass
+def decrypt(secretsfile, privkey):
+    ciphertext = secretsfile.read()
+    private_key = privkey.read()
+
+    decrypted_secrets = list()
+    for i in range(len(ciphertext) // 256):
+        decrypted_secrets.append(
+            encryption.decrypt_secret_with_rsa_key(
+                ciphertext[256*i:256*i+256], private_key).decode())
+        
+    click.echo(', '.join(decrypted_secrets))
 
 
 cli.add_command(generate_keypair)
 cli.add_command(encrypt)
+cli.add_command(decrypt)
