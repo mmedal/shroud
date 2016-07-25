@@ -60,7 +60,11 @@ setup(
     scripts=[
         'bin/shroud',
     ],
-    install_requires=[],
+    install_requires=[
+        'click',
+        'keyring',
+        'pycrypto'
+    ],
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
