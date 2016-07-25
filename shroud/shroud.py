@@ -1,6 +1,7 @@
 from os.path import expanduser, isfile
 
 import click
+import keyring
 
 from shroud import encryption
 
@@ -23,10 +24,16 @@ def cli():
               prompt="Passphrase for private key", default='',
               hide_input=True, confirmation_prompt=True,
               help="The passphrase for the RSA private key.")
+@click.option('--keychain', '-l',
+              is_flag=True, default=False,
+              help="Load the private key passphrase into the keychain.")
 @click.option('--forcewrite', '-f',
               is_flag=True, default=False,
               help="Overwrite existing keyfiles if applicable.")
-def generate_keypair(name, keydir, passphrase, forcewrite):
+def generate_keypair(name, keydir, passphrase, keychain, forcewrite):
+    if keychain and passphrase != '':
+        keyring.set_password('shroud', 'shroud', passphrase)
+
     pub_filename = '{}/{}.pub'.format(keydir, name)
     priv_filename = '{}/{}'.format(keydir, name)
     if isfile(pub_filename) and not forcewrite:
@@ -74,16 +81,35 @@ def encrypt(secret, pubkey, secretsfile):
               type=click.File('rb'),
               default=expanduser('~') + '/.ssh/shroud',
               help="The private key file to decrypt with.")
-def decrypt(secretsfile, privkey):
+@click.option('--passphrase', '-p',
+              default=None,
+              help="The passphrase for the RSA private key.")
+@click.option('--keychain', '-l',
+              is_flag=True, default=False,
+              help="Load the private key passphrase from keychain. "
+                   "Overrides '-p'.")
+def decrypt(secretsfile, privkey, passphrase, keychain):
     ciphertext = secretsfile.read()
     private_key = privkey.read()
+
+    if b'ENCRYPTED' in private_key:
+        if passphrase is None and not keychain:
+            exit("{} is an encrypted private key that requires a passphrase. "
+                 "Use the '-p' or '-l' option to proceed."
+                 .format(privkey.name))
+        elif keychain:
+            passphrase = keyring.get_password('shroud', 'shroud')
+            click.echo(passphrase)
 
     decrypted_secrets = list()
     for i in range(len(ciphertext) // 256):
         decrypted_secrets.append(
             encryption.decrypt_secret_with_rsa_key(
-                ciphertext[256*i:256*i+256], private_key).decode())
-        
+                ciphertext[256*i:256*i+256],
+                private_key,
+                passphrase=passphrase
+            ).decode())
+
     click.echo(', '.join(decrypted_secrets))
 
 
