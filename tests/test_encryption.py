@@ -19,4 +19,4 @@ class TestEncryption:
             self.__class__.ciphertext,
             private_key=self.__class__.priv,
             passphrase='supersecret'
-        )  == b'mysecret'
+        ) == b'mysecret'
