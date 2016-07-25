@@ -112,7 +112,7 @@ def decrypt(secretsfile, privkey, passphrase, keychain):
     for i in range(len(ciphertext) // 256):
         decrypted_secrets.append(
             encryption.decrypt_secret_with_rsa_key(
-                ciphertext[256*i:256*i+256],
+                ciphertext[256 * i:256 * i + 256],
                 private_key,
                 passphrase=passphrase
             ).decode())
