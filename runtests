@@ -9,7 +9,7 @@ import sys
 PYTEST_ARGS = ['tests', '--tb=short']
 FLAKE8_ARGS = ['shroud', 'tests', '--ignore=E501']
 COVERAGE_OPTIONS = {
-    'include': ['shroud/*', 'tests/*']
+    'include': ['shroud/*']
 }
 
 
