@@ -1,4 +1,5 @@
 # Main requirements
+click
 pycrypto
 
 # Testing requirements
