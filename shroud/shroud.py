@@ -55,6 +55,15 @@ def generate_keypair(name, keydir, passphrase, keychain, forcewrite):
 
 
 @click.command()
+@click.option('--passphrase', '-p',
+              prompt="Passphrase for private key",
+              hide_input=True, confirmation_prompt=True,
+              help="The RSA private key passphrase to store in keychain.")
+def arm_keychain(passphrase):
+    keyring.set_password('shroud', 'shroud', passphrase)
+
+
+@click.command()
 @click.argument('secret')
 @click.option('--pubkey', '-k',
               type=click.File('rb'),
@@ -65,7 +74,6 @@ def generate_keypair(name, keydir, passphrase, keychain, forcewrite):
               default='secrets.txt',
               help="The file to write the encrypted secret to.")
 def encrypt(secret, pubkey, secretsfile):
-    click.echo("Encrypting secret")
     ciphertext = encryption.encrypt_secret_with_rsa_key(
         secret.encode(), pubkey.read())
     click.echo("Writing encrypted secret to {}".format(secretsfile.name))
@@ -99,7 +107,6 @@ def decrypt(secretsfile, privkey, passphrase, keychain):
                  .format(privkey.name))
         elif keychain:
             passphrase = keyring.get_password('shroud', 'shroud')
-            click.echo(passphrase)
 
     decrypted_secrets = list()
     for i in range(len(ciphertext) // 256):
@@ -114,5 +121,6 @@ def decrypt(secretsfile, privkey, passphrase, keychain):
 
 
 cli.add_command(generate_keypair)
+cli.add_command(arm_keychain)
 cli.add_command(encrypt)
 cli.add_command(decrypt)
