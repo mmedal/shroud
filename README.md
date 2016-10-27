@@ -12,7 +12,7 @@
 * Valid keyring software if using keyring storage for private key passphrases.
   If you are using MacOS, you're all set (MacOS has a Keychain)!
   For Linux, see [details](http://pythonhosted.org/keyring/#linux).
-  For Ubuntu 16.04 and headless Linux, see
+  For installing SecretStorage on Ubuntu 16.04 and headless Linux, see
   [setup instructions](http://pythonhosted.org/keyring/#using-keyring-on-ubuntu-16-04).
 
 ## Installation
